@@ -31,6 +31,55 @@ names %>% str_replace_all("\\p{Han}","")  ##漢字を空白に置換
 
 
 
+
+
 library(tm)
+
+#「alice」というオブジェクトに「data/alice/」フォルダにあるすべてのデータを代入している。
+alice <- VCorpus(DirSource(dir = "data/alice/"),
+                 readerControl = list(language = "english"))
+
+
+alice %>% inspect   
+inspect(alice)
+
+alice[[1]] %>% as.character()
+as.character(alice[[1]])
+
+alice[[2]] %>% as.character()
+as.character(alice[[2]])
+
+alice[[3]] %>% as.character()
+as.character(alice[[3]])
+
+
+alice1 <- alice %>% tm_map(stripWhitespace)  ##余分な空白削除
+alice1[[1]] %>% as.character()
+alice1[[2]] %>% as.character()
+alice1[[3]] %>% as.character()
+
+
+library(magrittr)
+alice1 %<>% tm_map(removePunctuation) #ピリオド、カンマ、クエスチョンマーク、括弧などを削除
+alice1[[1]] %>% as.character()
+alice1[[2]] %>% as.character()
+alice1[[3]] %>% as.character()
+
+
+
+alice1 %>% tm_map(content_transformer(tolower))
+##この状態だと、alice1にこの行でだけ、命令を実行したことになる。
+##上書き保存されていないから、他の行でalice1オブジェクトに命令をしても変化は起きない。
+alice1[[1]] %>% as.character()
+alice1[[2]] %>% as.character()
+alice1[[3]] %>% as.character()
+
+## 上書き保存「%<>%」すると変化が分かる。
+alice1 %<>% tm_map(content_transformer(tolower))
+alice1[[1]] %>% as.character()
+alice1[[2]] %>% as.character()
+alice1[[3]] %>% as.character()
+
+
 
 
