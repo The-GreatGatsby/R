@@ -33,11 +33,14 @@ x
 
 
 
+######ƒƒƒXƒƒƒXƒƒƒXƒƒƒXƒƒƒXƒƒƒXƒƒƒXƒƒƒXƒƒƒXƒƒƒXƒƒƒXƒƒƒXƒƒƒXƒƒƒX###########
 merosu <- RMeCabFreq("data/merosu.txt")
 merosu %>% head(20)
 
+##ƒfƒtƒHƒ‹ƒg‚Å‚Í•¶Žš’PˆÊ‚Å‰ðÍ‚É‚È‚éButype=1v‚ÍŒ`‘Ô‘f‰ðÍB
+## TERM”‚ª1063ŒÂ‚ ‚é‚±‚Æ‚ª•ª‚©‚éB
 merosu <- docDF("data/merosu.txt",
-                type=1 , pos=c("–¼ŽŒ","Œ`—eŽŒ","“®ŽŒ"))
+                type=1 , pos=c("–¼ŽŒ","Œ`—eŽŒ","“®ŽŒ")) 
 merosu %>% head(10) ##umerosu.txtv‚ªŒê‚ÌoŒ»•p“xB•ª‚©‚è‚É‚­‚¢‚©‚ç•Ï‚¦‚éB
 
 
@@ -56,7 +59,7 @@ merosu2 <- merosu %>% select(TERM, POS1, FREQ) %>%  ## •\Ž¦ƒJƒ‰ƒ€‚©‚çPOS2i•iŽŒ
                                                     ## group_by‚ÅTERM‚ÆPOS1‚ªˆê’v‚·‚és‚ÌFREQ”‚ðˆê‚É‚·‚éiFREQ”‚Í“¯‚¶‚É‚È‚é‚ªAPOS2‚ªˆÙ‚È‚é‚Æ—¼•ûo—Í‚³‚ê‚éj
                       summarize(FREQ = sum(FREQ))   ## ’PŒê‚ÆPOS1i•iŽŒ‘å•ª—Þj‚ÌƒyƒA‚ª2sˆÈã‘¶Ý‚·‚ésiPOS2‚ªˆÙ‚È‚é‚©‚çj‚ðPOS2‚ð–³Ž‹‚µ‚Ä‡‘Ì‚³‚¹‚éB
                                                     ## FREQ‚Æ‚¢‚¤s‚ðì‚Á‚Äi¡‰ñ‚Íã‘‚«jA‚»‚±‚É2sˆÈã‘¶Ý‚µ‚½ƒyƒA‚Ì‡Œv’l‚ð‘ã“ü‚µ‚½B
-merosu2 %>% NROW() ##1300‚ ‚Á‚½s‚ª300‚®‚ç‚¢“‡‚³‚ê‚½B
+merosu2 %>% NROW() ##1063‚ ‚Á‚½TERM‚ª30‚®‚ç‚¢“‡‚³‚ê‚½B
 merosu2 %>% filter(TERM == "ƒƒƒX")
 
 ## group_by‚ÅPOS1‚ÅƒOƒ‹[ƒv‰»iTERM‚Í–³Ž‹j
@@ -67,14 +70,41 @@ merosu2 %>% group_by(POS1) %>% summarize(SUM = sum(FREQ))
 ## –ñ6Š„‚ª–¼ŽŒ‚Å‚ ‚é‚±‚Æ‚ª•ª‚©‚éB
 merosu2 %>% group_by(POS1) %>% summarize(SUM = sum(FREQ)) %>% mutate(PROP = SUM / sum(SUM))
 
+##•iŽŒî•ñ‚ðŽw’è‚µ‚ÄŒŸõ
+merosu %>% filter(POS1 %in% c("“®ŽŒ","Œ`—eŽŒ"), POS2 == "Ž©—§") %>% NROW()
+
+
+
+################’wå‚ÌŽ…’wå‚ÌŽ…’wå‚ÌŽ…’wå‚ÌŽ…’wå‚ÌŽ…’wå‚ÌŽ…’wå‚ÌŽ…’wå‚ÌŽ…#####################
+
+## ‹¤‹NŒê‚Ì‰ðÍB‘æ1ˆø”‚Éƒtƒ@ƒCƒ‹–¼B‘æ2ˆø”‚ÉnodeB‘æ3ˆø”‚ÉspanB
+res <- collocate("data/kumo.txt", node = "‹ÉŠy", span = 3)
+
+#[morphems]‚ÍAŒ`‘Ô‘f‚ÌŽí—Þ‚Ì”B
+#[tokens]‚ÍA‘’PŒê”B
+res %>% tail(15)
+
+log2(4/((4/1808)*3*2*10))  ##ƒm[ƒhu‹ÉŠyv‚Æ‹¤‹NŒêu˜@’rv‚ÌMI’lB1.58ˆÈã‚È‚Ì‚Å‹¤‹NŠÖŒW‚ ‚èB
+res <- collScores(res, node = "‹ÉŠy", span = 3) # ucollScoresv‚ÍAT’l‚ÆMI’l—¼•ûo‚µ‚Ä‚­‚ê‚éB
+res %>% tail(15) 
 
 
 
 
+####################’PŒê•¶‘s—ñ’PŒê•¶‘s—ñ’PŒê•¶‘s—ñ’PŒê•¶‘s—ñ’PŒê•¶‘s—ñ#####################
+mat <- docMatrix("data/doc") #docƒtƒHƒ‹ƒ_‚É‚ ‚éƒf[ƒ^‚ð‘S‚Ä‘ã“ü
+mat #@’PŒê•¶‘s—ñ‚Ì‰ðÍŒ‹‰Ê‚Ís—ñƒTƒCƒY‚ª‘å‚«‚¢‚½‚ßA‚»‚Ì‚Ü‚Üo—Í‚·‚é‚Ì‚Í—Ç‚­‚È‚¢i¡‰ñ‚Í¬‚³‚¢‚©‚çOKj
+# uless-than-nv‚Ín‰ñ–¢–ž‚Ì’PŒê‚ª‰½Ží—ÞoŒ»‚µ‚Ä‚¢‚é‚©B¡‰ñ‚Í1–¢–ž‚â‚©‚ç0B
+# utotal-tokensv‚Í‘S‚Ä‚Ì’PŒêiŒ`‘Ô‘fj”B
 
+## Œ`‘Ô‘f‰ðÍ‚ð‚·‚é‚½‚ß‚É’PŒê•¶‘s—ñ‚ðì‚Á‚½B‚µ‚©‚µ2‚Â‚Ìƒƒ^î•ñ‚Í‰ðÍ‚É‚Í•K—v‚È‚¢‚©‚çíœB
+mat <- mat[ rownames(mat) != "[[LESS-THAN-1]]", ]
+mat <- mat[ rownames(mat) != "[[TOTAL-TOKENS]]", ]
 
-
-
-
-
+# docMatrix()‚ÌƒfƒtƒHƒ‹ƒg‚Å‚Íu–¼ŽŒEŒ`—eŽŒv‚Ì‚ÝB‚¾‚©‚çpos‚ÅŽw’è‚·‚éB
+# ’PŒêiŒ`‘Ô‘fj‚É‚ÍA“à—eŒê‚Æ‹@”\Œê‚ª‚ ‚éB
+# “à—eŒê‚Í–¼ŽŒE“®ŽŒEŒ`—eŽŒ‚È‚ÇA•¶‘‚Ì“à—e‚ð’¼Ú•\Œ»‚·‚é‚à‚ÌB•¡”‚Ì•¶‘‚ðƒe[ƒ}‚²‚Æ‚É•ª—Þ‚Å‚«‚éB
+# ‹@”\Œê‚Í•ŽŒ‚È‚ÇB‘‚«Žè‚Ì•¶‘Ì‚ð‰ðÍ‚Å‚«‚éB
+mat <- docMatrix("data/doc", pos = c("–¼ŽŒ","Œ`—eŽŒ","“®ŽŒ","•ŽŒ"))
+mat
 
