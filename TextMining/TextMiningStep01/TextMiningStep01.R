@@ -79,7 +79,33 @@ alice1 %<>% tm_map(content_transformer(tolower))
 alice1[[1]] %>% as.character()
 alice1[[2]] %>% as.character()
 alice1[[3]] %>% as.character()
+## alice1 %<>% tm_map(content_transformer(toupper))
 
 
 
+alice1 %<>% tm_map(removeWords,stopwords("english")) 
+alice1[[1]] %>% as.character()
+alice1[[2]] %>% as.character()
+alice1[[3]] %>% as.character()
+## ストップワードを削除・上書きした。しかし、削除部分が空白になっているため、空白削除の前にやるべき。
+
+
+
+library(SnowballC)
+
+## ステミング（変化形を語幹に戻してカウント）
+alice1 %<>% tm_map(stemDocument)
+alice1[[1]] %>% as.character()
+
+
+## 単語文書行列（文書を単語単位に分解した結果をマトリックス化）
+dtm <- TermDocumentMatrix(alice1)
+## inspect()で確認できる
+dtm %>% inspect()
+## 3回以上出現した単語を出力。
+dtm %>% findFreqTerms(3)
+## alicと相関係数が0.8以上の単語のみ出力。
+dtm %>% findAssocs("alic", 0.8)
+
+vignette("tm")
 
