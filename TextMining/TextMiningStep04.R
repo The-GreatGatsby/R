@@ -82,23 +82,38 @@ library(RMeCab)
 FM <- docDF("data/okinawa", type = 1,     #type=1は形態素解析。
             pos = c("名詞","動詞","形容詞"))
 
+# 形態素から、必要な単語のみを抽出。
 FM2 <- FM %>% filter(POS2 %in% c("一般", "固有", "自立"))
-FM2 <- FM2 %>% filter(! TERM%in% c("ある","いう","いる", "する", 
-                                   "できる", "なる","思う"))
 
+# 動詞の自立語には、「ある」「いう」「できる」「思う」など不要な単語も入っている。
+# これらを削除するには、「!」と「%in%」を使う。
+FM2 <- FM2 %>% filter(! TERM %in% c("ある","いう","いる", "する", 
+                                    "できる", "なる","思う"))
 FM2 %>% NROW()
 
+# 「$」は添字。FM2の単語文書行列に「SUMS」という列を新規追加。
+# rowSumsは各行の合計を求める。SUMS列に代入。
+# 1，2，3列目は形態素と品詞の情報なので除外。
 FM2$SUMS <- rowSums(FM2[, -(1:3)])
 summary(FM2$SUMS)
 
+# 今回は7回以上の単語のみ抽出するが、数字はデータによる
+# 各行の合計をSUMSに入れているので、7回は、「男女20～70代全部の合計で7回以上使われた単語」という意味
 FM3 <- FM2 %>% filter(SUMS >= 7)
 FM3 %>% NROW
 colnames((FM3))
 
+# 7回以上出現した単語を出力
 FM3$TERM
+################################ 168行目からオカシイ。
+FM3$TERM[168]
+
+
 
 library(stringr)
 ## 正規表現で数値列だけを取り出す
+# matches()は指定された文字列と一致する列だけ取り出す。
+# [FM]はFかMで始まり、「\\d\\d」は数字が2つ続く。
 FM4 <- FM3 %>% select(matches("[FM]\\d\\d"))
 ## 列名を設定
 colnames(FM4) <- str_extract(colnames(FM4), "[FM]\\d\\d")
@@ -110,8 +125,11 @@ dim(FM4)
 colnames(FM4) 
 rownames(FM4)
 
+
+
+
+
 ### 7.3 意見データの対応分析
-#install.packages(c("FactoMineR", "factoextra"))
 library(FactoMineR)
 FM4ca <- CA(FM4, graph = FALSE)
 ## ggplot2 ベースのバイプロットを描く
