@@ -129,8 +129,10 @@ rownames(FM4)
 
 
 
-### 7.3 意見データの対応分析
+##################### 意見データの対応分析
 library(FactoMineR)
+# 対応分析はCA。CAは対応分析だけでなく、独自にバイプロットも作成する。
+# 今回は、ggplot2で作りたいから、「graph = FALSE」にする。
 FM4ca <- CA(FM4, graph = FALSE)
 ## ggplot2 ベースのバイプロットを描く
 library(factoextra)
@@ -147,9 +149,6 @@ dev.off()
 ### 独立性の検定(カイ自乗検定)
 # Excel ファイルの読み込み
 library(readxl)
-
-setwd("C:/Users/ishida/Documents/TextMining")
-
 dat <- read_excel("data/sentences.xlsx")
 
 ## クロス表を生成
@@ -160,8 +159,10 @@ options("digits" = 7)
 
 chisq.test(dat_tb)
 
-### 7.5 対応分析
 
+
+
+### 対応分析
 dat <- matrix(c(1,2,0,0,  0,2,6,0, 0,1,2,2,  0,0,0,2),
               ncol = 4, byrow = TRUE)
 colnames(dat) <- c("中卒F", "高校中退F", "高卒F", "大卒F")
@@ -171,6 +172,7 @@ dat
 library(FactoMineR)
 library(factoextra)
 datCA <- CA(dat, graph = FALSE)
+# 座標位置が近ければ近いほど、相関がある。
 fviz_ca_biplot(datCA)
 
 # 上記の実行結果の画像で文字化けが生じている場合、以下のようにPDF画像として作成して確認してみてください
@@ -180,17 +182,10 @@ cairo_pdf(file = "datCA.pdf", family = "JP1") # Mac の場合は family = "HiraKakuP
 fviz_ca_biplot(datCA)
 dev.off()
 
-
+# 「corresp」はMASSライブラリの関数である。
+# しかし、MASSライブラリはdplyrライブラリと一部、衝突するので、読み込まない。
+# 「：：」で「パッケージ名::関数」のように、特定の関数だけ読み込む。
 dat_cp <- MASS::corresp(dat, nf = 2)
 biplot(dat_cp)
-
-
-
-
-
-
-
-
-
 
 
