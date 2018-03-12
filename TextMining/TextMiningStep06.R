@@ -1,12 +1,23 @@
-############################################# chapter09から
+##　あいうえお
 
-### l9.1 解析の準備
+
+
+
+
+## 戦後の総理大臣の所信表明演説を分析。
+## 仮定：所信表明はその時代の政治的経済的課題を反映しているはずなので、
+## 内容で分類すると時代ごとにクラスター（グループ）を形成できるかも
+
 library(RMeCab)
-## Windowsの場合は以下の "data/prime/utf" を "data/prime/sjis" にするなど
-## 自身の作業環境にあわせて適宜変更
-prime <- docMatrix2("data/prime/utf8", pos = c("名詞","形容詞","動詞"), 
-                    weight = "tf*idf*norm")
+# docMatrix2の方が高速。
+## 単語文書行列を作成する場合、入力データの長さ（文章量）が大きく異なると、解析に影響が出る。
+## 長さの影響を調整することを、「正規化」と言う。
+## 「weight = "tf*idf*norm"」は文章量の違いを標準化してる。p90
+prime <- docMatrix2("data/prime/sjis", pos = c("名詞","形容詞","動詞"), 
+                    weight = "tf*idf*norm")  
 
+# primeオブジェクトの列数(ncol)・行数(nrow)
+# ;で命令を複数繋げれる。
 ncol(prime) ; nrow(prime)
 
 
