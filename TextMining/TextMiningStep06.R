@@ -50,9 +50,8 @@ hc <- prime %>% t %>% dist %>% hclust("ward.D2")
 ### だから、t()で転置。
 
 
-install.packages("ggdendro")
-
 library(ggdendro)
+## FALSEにすると、x軸にファイル名が並ぶ。今はy軸に並んでる。
 ggdendrogram(hc, rotate= TRUE)
 
 # 上記の実行結果の画像で文字化けが生じている場合、以下のようにPDF画像として作成して確認してみてください
@@ -77,7 +76,7 @@ TD <- matrix (c(1,0,0,0,1,0,
 colnames(TD) <- paste0("doc", 1:6)
 rownames(TD) <- paste0("w", 1:8)
 
-# 特異値分解
+# 特異値分解（3つの行列の積）
 TD_svd <- svd(TD)
 
 options(digits = 3)
