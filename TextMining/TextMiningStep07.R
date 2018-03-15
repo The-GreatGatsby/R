@@ -3,15 +3,23 @@
 getwd()
 library(RMeCab)
 
-### N グラムを利用したクラスター分析
-res <- docNgram("data/writers", type = 0)
+############################ N グラムを利用したクラスター分析 #####################
 
+### まずは、文字のバイグラムで、森鴎外と夏目漱石を判別できるかチャレンジ。
+### 文字の出現頻度を解析するから、テキスト量が同じぐらいでないといけない。（作家判別に影響するから）
+### type=0は文字単位。
+### docNgramはデフォルトで、バイグラム。
+res <- docNgram("data/writers", type = 0)
+#行数・列数の確認
 ncol(res) ; nrow(res)
 
-
+library(dplyr) ## パイプ処理はdplyrが必要。
 res %>% tail()
 
-library(dplyr)
+# クラスター分析をして、似ている作品を近くに表示。
+# このクラスター分析の分類対象は、テキストである。だから分類対象であるテキストを行側に持ってくる必要がある。
+# 距離測定には、ユークリッド距離。dist()
+# ウォード法でクラスターを生成。（D2じゃないとアカン、Dはエラー）
 res2 <- res %>% t() %>% dist() %>% hclust("ward.D2")
 
 library(ggdendro)
@@ -26,23 +34,26 @@ dev.off()
 
 
 
-### 10.3 書き手の癖
+######################### 助詞と読点から、書き手の癖を見分ける。 ###################
 res2 <- res[rownames(res) %in% c("[と-、]", "[て-、]", "[は-、]", "[が-、]", 
                                  "[で-、]", "[に-、]", "[ら-、]", "[も-、]"), ]
+#　次元（行数・列数）の確認。
 dim(res2)
 
 iris %>% head()
 
 
-### 10。4 主成分分析
+### 主成分分析。5列目はカテゴリ変数で分析に入らないので削除。
 iris_pc <- princomp(iris[ , -5])
 iris %>% head()
 
 ## アヤメの種類を数値で表わす
 iris.name <- as.numeric(iris[, 5])
 ## プロットの土台だけ描く
+# scores（主成分得点）のうち、最初の2つ（1・2列目）をx・y軸とする。
 plot(iris_pc$scores[, 1:2], type = "n")
 ## 土台に文字を重ねる
+## labはラベル。iris.nameにアヤメの種類を1，2，3で表したオブジェクトがあるからそれを使用。
 text(iris_pc$scores[, 1:2], lab = iris.name, 
      col = as.numeric(iris.name))
 
@@ -56,11 +67,11 @@ options(digits = 3)
 
 summary(res2_pc)
 
-install.packages("ggfortify")
 library(ggfortify)
 
 library(stringr)
 
+# ファイル名が長いから縮める。
 rownames(res2_pc$scores) <- res2_pc$scores %>% 
   rownames() %>% 
   str_extract("[a-z]+") %>% 
