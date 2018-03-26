@@ -12,27 +12,15 @@ update.packages(c("twitteR", "bit64", "rjson", "DBI", "httr",
 
 library("twitteR")
 library(ROAuth)
-### 以下の ################################################## を自身が取得したキーに置き換える
-# Consumer Key
-consumerKey <- "hQQ8mlkFhG4UoUV67xTwIbQTu"
-# Consumer Secret
-consumerSecret <- " dd2ldZBbaU6wJS3ElV5xQozZg1SjuVJUgITlA9Cc8K6cub59Xo"
-# Access Token
-accessToken <- "898910528730406912-zKbDnTeda1pHuQvXgokDmQOzxnB3XAh"
-# Access Token Secret
-accessSecret <- " lxpkojqoTPABQT2g3F5SZvI9CNPTmwyDpiIg7TTAn8tlb"
+### APIキー
+consumerKey <- ""
+consumerSecret <- ""
+accessToken <- ""
+accessSecret <- ""
 
 
-
-
-download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
-cred <- OAuthFactory$new(consumerKey=consumerKey,
-                         consumerSecret=consumerSecret,
-                         requestURL ="https://api.twitter.com/oauth/request_token",
-                         accessURL = "https://api.twitter.com/oauth/access_token",
-                         authURL="https://api.twitter.com/oauth/authorize")
-
-cred$handshake(cainfo="cacert.pem")
+options(httr_oauth_cache = TRUE)
+setup_twitter_oauth(consumerKey, consumerSecret, accessToken, accessSecret)
 
 
 
@@ -60,17 +48,17 @@ req <- GET("https://api.twitter.com/1.1/statuses/home_timeline.json",
            config(token = twitter_token))
 stop_for_status(req)
 content(req)
+######################もう一個###################################
+
+download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
+cred <- OAuthFactory$new(consumerKey=consumerKey,
+                         consumerSecret=consumerSecret,
+                         requestURL ="https://api.twitter.com/oauth/request_token",
+                         accessURL = "https://api.twitter.com/oauth/access_token",
+                         authURL="https://api.twitter.com/oauth/authorize")
+
+cred$handshake(cainfo="cacert.pem")
 ##########################################################################
-
-
-
-################################# 認証 エラー  #############################
-options(httr_oauth_cache = TRUE)
-setup_twitter_oauth(consumerKey, consumerSecret, accessToken, accessSecret)
-## APIの使用制限（◯分以内に◯個のリクエストが可能、みたいな制限）か何かかも
-## 時間をおいてから、同じコードを実行したら普通に進めるかも。
-## 上記エラーが出た際、自分のTwitter Apps管理画面から、キーとトークンの再発行して入れ替えると解決する場合もある
-###########################################################################
 
 
 ## ユーザーのツイートを取得(リスト型)
