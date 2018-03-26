@@ -16,11 +16,11 @@ library(ROAuth)
 # Consumer Key
 consumerKey <- "hQQ8mlkFhG4UoUV67xTwIbQTu"
 # Consumer Secret
-consumerSecret <- "dd2ldZBbaU6wJS3ElV5xQozZg1SjuVJUgITlA9Cc8K6cub59Xo"
+consumerSecret <- " dd2ldZBbaU6wJS3ElV5xQozZg1SjuVJUgITlA9Cc8K6cub59Xo"
 # Access Token
 accessToken <- "898910528730406912-zKbDnTeda1pHuQvXgokDmQOzxnB3XAh"
 # Access Token Secret
-accessSecret <- "lxpkojqoTPABQT2g3F5SZvI9CNPTmwyDpiIg7TTAn8tlb"
+accessSecret <- " lxpkojqoTPABQT2g3F5SZvI9CNPTmwyDpiIg7TTAn8tlb"
 
 
 
