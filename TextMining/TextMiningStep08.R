@@ -100,6 +100,7 @@ searchTwitter("統計",                # 検索ワード。複数の場合は+でつなぐ
 
 
 ## Mac ないし Linux の場合。※なぜかいける。
+## 今現在の時刻をツイート
 tweet(date())
 ### 特定のアカウントのツィートを取得
 tweets <- userTimeline("mextjapan", 200)
@@ -118,10 +119,10 @@ library(magrittr)
 
 ## アカウントIDやURLや各種記号も入ってる。それを削除。
 texts %<>% str_replace_all("\\p{ASCII}", "")
-
 # 欠損値となった要素があれば省く
 # textsオブジェクトに、textsのNAでなデータのみ代入。
-texts <- texts[!is.na(texts)]
+texts <- texts[!is.na(texts)] # texts %>% iconv(from = "UTF-8", to = "CP932") %>% na.omit()でも良い
+
 
 
 # Windowsの場合文字コードを変更する
@@ -138,10 +139,9 @@ write(text2, xfile)
 
 library(RMeCab)
 # 形態素解析する。
-mext <- docDF(xfile, type = 1, pos = "名詞")
-
 # 名詞のみ抽出
 mext <- docDF(xfile, type = 1, pos = "名詞")
+
 #library(magrittr) # %<>% 演算子と ! を利用する
 # 非自立、数、サ変を省く。（!をうまく使う）
 mext %<>% filter(!POS2 %in% c("非自立", "数","サ変接続"))
