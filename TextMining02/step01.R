@@ -115,21 +115,9 @@ yukiguni <- "国境の長いトンネルを抜けると雪国であった。"
 unlist(strsplit(yukiguni, split = ""))
 ###################################################
 
-
-##### 4.5 #####
-
-# 作業ディレクトリの確認
-getwd()
-
-# 作業ディレクトリの変更
-# 以下は，「C」ドライブ直下の「Data」フォルダに変更する例
-setwd("C:/Data")
-# 指定したフォルダが存在しない場合は，Error in setwd("C:/Data") : cannot change working directoryといったエラーメッセージが表示される
-
+setwd("C:/Users/rstud/Documents/GitHub/R/TextMining02")
 # ファイルが作業ディレクトリにある場合
-data01 <- read.csv("data01.csv" , header = FALSE)
-# ファイルが作業ディレクトリではなく，C:/Dataにある場合
-data01 <- read.csv("C:/Data/data01.csv", header = FALSE)
+data01 <- read.csv("data/data01.csv" , header = FALSE)
 data01
 
 # マウス操作でdata01.csvを選択する場合
@@ -145,14 +133,19 @@ data03 <- read.csv(file.choose(), header = TRUE, skip = 2)
 data03
 
 # マウス操作でdata04.csvを選択する場合
+# 行ラベル・列ラベルがある場合は「header=FALSE」と「row.names=1」
 data04 <- read.csv(file.choose(), header = TRUE, row.names = 1)
 data04
 
-# テキストファイルを読み込む場合
+# txtを読み込むには、scan
 # 文単位で読み込む場合（data05.txtを選択）
+# quiet=TRUEで、データの個数を非表示。
+# sep="\n"で文節単位に分ける。指定しないと単語単位になる。
+# what=charは数字ではなく文字をスキャンするという意味。
 data05 <- scan(file.choose(), what = "char", sep = "\n", quiet = TRUE)
 data05
-単語単位で読み込む場合（data05.txtを選択）
+
+#単語単位で読み込む場合（data05.txtを選択）
 data05 <- scan(file.choose(), what = "char", quiet = TRUE)
 data05
 
