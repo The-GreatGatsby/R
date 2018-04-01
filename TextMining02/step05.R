@@ -42,7 +42,9 @@ hclust.result <- hclust(dist.result, method = "ward.D2")
 # 結果の可視化
 plot(hclust.result)
 
+
 # データセットの転置
+# さっきは作品（テキスト）をグループ化したが、今回はアルファベット26文字を変数とするため、転置している。
 author.3 <- t(author.2)
 # ユークリッド距離の計算
 dist.result.2 <- dist(author.3, method = "euclidean")
@@ -54,10 +56,14 @@ plot(hclust.result.2)
 # 階層型クラスターつきのヒートマップ
 heatmap(author.2)
 
+
+
+
+
 ##### 9.2 #####
 
 # 追加パッケージのインストール（初回のみ）
-install.packages("kernlab", dependencies = TRUE)
+# install.packages("kernlab", dependencies = TRUE)
 # 追加パッケージの読み込み（Rを起動するごとに毎回）
 library(kernlab)
 # データセットの準備
@@ -80,13 +86,19 @@ head(spam.train, 5)
 # 偶数行データの冒頭5行の確認
 head(spam.test, 5)
 
-# MASSパッケージの読み込み（Rを起動するごとに毎回）
+# 線形判別分析LDAは、MASSライブラリにある
 library(MASS)
 # 線形判別分析
 # 判別式の作成
 lda.result <- lda(type ~ ., data = spam.train)
 # 結果の確認
 lda.result
+# 「prior probabilies of groups」は、訓練データ全体におけるnonspamとspamの割合
+# 「group means」は、各説明変数に関する群ごとの平均値。
+# 「coefficients of linear discriminants」は、線形判別関数の係数。
+# 線形判別関数の係数の絶対値（正負関係なく）が大きいほど、nonspamとspamの分類に役立つ
+
+
 
 # 判別式に基づく自動分類
 lda.predict.result <- predict(lda.result, spam.test)
