@@ -1,8 +1,7 @@
 #####あいうえお
 
-install.packages(c("twitteR", "bit64", "rjson", "DBI", "httr", 
-                   "base64enc"), dependencies = TRUE)
-install.packages("ROAuth")
+# install.packages(c("twitteR", "bit64", "rjson", "DBI", "httr", "base64enc"), dependencies = TRUE)
+# install.packages("ROAuth")
 
 update.packages(c("twitteR", "bit64", "rjson", "DBI", "httr", 
                   "base64enc", "ROAuth"),dependencies=TRUE)
@@ -23,47 +22,9 @@ options(httr_oauth_cache = TRUE)
 setup_twitter_oauth(consumerKey, consumerSecret, accessToken, accessSecret)
 
 
-
-
-###################認証エラーが起きた時用################################
-library(httr)
-# 1. Find OAuth settings for twitter:
-#    https://dev.twitter.com/docs/auth/oauth
-oauth_endpoints("twitter")
-
-# 2. Register an application at https://apps.twitter.com/
-#    Make sure to set callback url to "http://127.0.0.1:1410/"
-#
-#    Replace key and secret below
-myapp <- oauth_app("twitter",
-                   key = "hQQ8mlkFhG4UoUV67xTwIbQTu",
-                   secret = "lxpkojqoTPABQT2g3F5SZvI9CNPTmwyDpiIg7TTAn8tlb"
-)
-
-# 3. Get OAuth credentials
-twitter_token <- oauth1.0_token(oauth_endpoints("twitter"), myapp)
-
-# 4. Use API
-req <- GET("https://api.twitter.com/1.1/statuses/home_timeline.json",
-           config(token = twitter_token))
-stop_for_status(req)
-content(req)
-######################もう一個###################################
-
-download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
-cred <- OAuthFactory$new(consumerKey=consumerKey,
-                         consumerSecret=consumerSecret,
-                         requestURL ="https://api.twitter.com/oauth/request_token",
-                         accessURL = "https://api.twitter.com/oauth/access_token",
-                         authURL="https://api.twitter.com/oauth/authorize")
-
-cred$handshake(cainfo="cacert.pem")
-##########################################################################
-
-
 ## ユーザーのツイートを取得(リスト型)
 mytweets <- userTimeline("statsbeginner",       # ユーザ名を@無しで入れる
-             n=10,                  # 取得件数を指定（上限は3200?）
+             n=1000,                  # 取得件数を指定（上限は3200?）
              maxID=NULL,           # ツイートIDの範囲指定（今回は無し）
              sinceID=NULL,         # ツイートIDの範囲指定（今回は無し）
              includeRts=TRUE,      # RTを含むかどうか
@@ -76,8 +37,8 @@ print(mytweets.df)
 
 ## ツイートを検索
 searchTwitter("統計",                # 検索ワード。複数の場合は+でつなぐ
-              n=5,                   # 取得する件数
-              lang=NULL,             # 言語（日本語に限定するなら"ja", else NULL）
+              n=500,                   # 取得する件数
+              lang="ja",             # 言語（日本語に限定するなら"ja", else NULL）
               since=NULL,            # 期間指定
               until=NULL,            # 期間指定
               locale=NULL,           # ロケールを指定（日本なら"ja")
@@ -157,15 +118,16 @@ mext %<>% select(everything(), FREQ = starts_with("file"))
 unlink(xfile) #一時ファイルを削除
 mext %>% arrange(FREQ) %>% tail(40)
 
-
-
 library (wordcloud)
 #  pal <- brewer.pal(8,"Dark2")
 # wordcloud (m2[,1], m2[,4], min.freq = 7, colors = pal)
 wordcloud (mext$TERM, mext$FREQ, min.freq = 7, family = "JP1")
 
 
-###  日本国内のトレンドの取得
+
+
+
+##############  日本国内のトレンドの取得
 woeid <- availableTrendLocations()
 # 地域IDを確認
 woeid %>% filter(country == "Japan")
@@ -175,9 +137,9 @@ trends <- getTrends(1118370)
 trends$name
 
 
-center <- searchTwitter(searchString = "jssp_ss_2018_R", 
-                        n = 1000, 
-                        since = "2018-03-21"
+center <- searchTwitter(searchString = "センター試験", 
+                        n = 1000,
+                        since = "2017-01-13"
                         )
 
 cntDF <- twListToDF(center)

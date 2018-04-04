@@ -1,3 +1,5 @@
+
+setwd("C:/Users/rstud/Documents/GitHub/R/TextMining")
 library(RMeCab)
 
 
@@ -34,15 +36,17 @@ names %>% str_replace_all("\\p{Han}","")  ##漢字を空白に置換
 
 
 library(tm)
-
 #「alice」というオブジェクトに「data/alice/」フォルダにあるすべてのデータを代入している。
+# VCorpus関数は、テキストを一時的にメモリに保存。コーパスに変換。
 alice <- VCorpus(DirSource(dir = "data/alice/"),
                  readerControl = list(language = "english"))
 
-
-alice %>% inspect   
+# inspectで登録された情報を確認。
+# aliceテキストは3種類あるから、3つのリストになっている。
+alice %>% inspect
 inspect(alice)
 
+# テキストの本文を出力するには、as.character()
 alice[[1]] %>% as.character()
 as.character(alice[[1]])
 
@@ -52,8 +56,8 @@ as.character(alice[[2]])
 alice[[3]] %>% as.character()
 as.character(alice[[3]])
 
-
-alice1 <- alice %>% tm_map(stripWhitespace)  ##余分な空白削除
+#tm_map()関数で、stripWhitespaceを引数に取ると、余分な空白を削除できる
+alice1 <- alice %>% tm_map(stripWhitespace)  
 alice1[[1]] %>% as.character()
 alice1[[2]] %>% as.character()
 alice1[[3]] %>% as.character()
@@ -61,6 +65,7 @@ alice1[[3]] %>% as.character()
 
 library(magrittr)
 alice1 %<>% tm_map(removePunctuation) #ピリオド、カンマ、クエスチョンマーク、括弧などを削除
+# removePunctuation(alice1)、でも良い。
 alice1[[1]] %>% as.character()
 alice1[[2]] %>% as.character()
 alice1[[3]] %>% as.character()
@@ -84,15 +89,16 @@ alice1[[3]] %>% as.character()
 
 
 alice1 %<>% tm_map(removeWords,stopwords("english")) 
+# removeWords(データ,stopwords("english"))
+# removeWords(データ,c("the","and"))でもいける。
 alice1[[1]] %>% as.character()
 alice1[[2]] %>% as.character()
 alice1[[3]] %>% as.character()
 ## ストップワードを削除・上書きした。しかし、削除部分が空白になっているため、空白削除の前にやるべき。
-
+alice1 %<>% tm_map(stripWhitespace)
 
 
 library(SnowballC)
-
 ## ステミング（変化形を語幹に戻してカウント）
 alice1 %<>% tm_map(stemDocument)
 alice1[[1]] %>% as.character()

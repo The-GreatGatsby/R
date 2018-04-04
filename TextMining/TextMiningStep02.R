@@ -1,3 +1,5 @@
+
+setwd("C:/Users/rstud/Documents/GitHub/R/TextMining")
 library(RMeCab)
 
 RMeCabC("本を読んだ")
@@ -8,8 +10,11 @@ library(dplyr)
 ## 出力結果が縦（リスト）だと見にくいから、「unlist」でベクトル化。
 RMeCabC("今日は本を読んだ。テキストマイニングに関する本だ。とても面白い。") %>% unlist()
 hon <- RMeCabC("今日は本を読んだ。") %>% unlist()
-hon [names(hon) %in% c("名詞","動詞")]  ## 動詞が表層語（活用形）のまま
-RMeCabC("今日は本を読んだ",1) %>% unlist() ## 第2引数で「1」を入れると、原形を出力。
+# 名詞と動詞のみ抽出。
+# デフォルトなので、動詞が表層語（活用形）のまま
+hon [names(hon) %in% c("名詞","動詞")]
+# 第2引数で「1」を入れると、原形を出力。
+RMeCabC("今日は本を読んだ",1) %>% unlist()
 ?RMeCabC
 
 file.exists("data/hon.txt") ##ファイルがあるかを確認
@@ -24,7 +29,10 @@ unlink(tmp) # 一時ファイルを削除
 x # 解析結果を確認
 
 library(purrr)
-x %>% map_chr(extract(9)) #xの各リストの9番目（読み方）を抽出。
+# map()関数は、リストから要素を効率的に取り出すための関数。
+# map_chr()は、文字列データに使用できる。
+#xの各リストの9番目（ここでは「読み方」）を抽出。
+x %>% map_chr(extract(9))
 
 ######################################### ここよくわからん。 ####################################
 tmp <- data.frame(BUN = "本を買った", stringAsFactor = FALSE)
@@ -34,6 +42,7 @@ x
 
 
 ######メロスメロスメロスメロスメロスメロスメロスメロスメロスメロスメロスメロスメロスメロス###########
+# テキストの語彙と頻度の一覧表を作るには、rmecabfreq()かdocDF()
 merosu <- RMeCabFreq("data/merosu.txt")
 merosu %>% head(20)
 
@@ -41,8 +50,7 @@ merosu %>% head(20)
 ## TERM数が1063個あることが分かる。
 merosu <- docDF("data/merosu.txt",
                 type=1 , pos=c("名詞","形容詞","動詞")) 
-merosu %>% head(10) ##「merosu.txt」が語の出現頻度。分かりにくいから変える。
-
+merosu %>% head(10) 
 
 library(magrittr)
 #出現頻度の列名を「FREQ」に変えて、上書き保存して、FREQの小さい順に並び替えた。
@@ -75,6 +83,8 @@ merosu %>% filter(POS1 %in% c("動詞","形容詞"), POS2 == "自立") %>% NROW()
 
 
 
+
+
 ################蜘蛛の糸蜘蛛の糸蜘蛛の糸蜘蛛の糸蜘蛛の糸蜘蛛の糸蜘蛛の糸蜘蛛の糸#####################
 
 ## 共起語の解析。第1引数にファイル名。第2引数にnode。第3引数にspan。
@@ -84,16 +94,23 @@ res <- collocate("data/kumo.txt", node = "極楽", span = 3)
 #[tokens]は、総単語数。
 res %>% tail(15)
 
-log2(4/((4/1808)*3*2*10))  ##ノード「極楽」と共起語「蓮池」のMI値。1.58以上なので共起関係あり。
-res <- collScores(res, node = "極楽", span = 3) # 「collScores」は、T値とMI値両方出してくれる。
-res %>% tail(15) 
 
+# 「collScores」は、T値とMI値両方出してくれる。
+# T値は、平均値の差の検定。しかし、母集団を正規分布と仮定するため、言語処理には向かないという批判もある。
+# T = 実測値-期待値/実測値の平方根。1.65以上なら共起が偶然ではないと考えられる。
+# MI値は、相互情報量（ある語が出現した時、特定の語の出現を予測させる度合い）を意味する。
+# MI値は、log2(共起回数/共起語の期待値)。対数の低は絶対に2。
+res <- collScores(res, node = "極楽", span = 3) 
+##ノード「極楽」と共起語「蓮池」のMI値。1.58以上なので共起関係あり。
+log2(4/((4/1808)*3*2*10))
+res %>% tail(15)
 
 
 
 ####################単語文書行列単語文書行列単語文書行列単語文書行列単語文書行列#####################
 mat <- docMatrix("data/doc") #docフォルダにあるデータを全て代入
-mat #　単語文書行列の解析結果は行列サイズが大きいため、そのまま出力するのは良くない（今回は小さいからOK）
+mat 
+#　単語文書行列の解析結果は行列サイズが大きいため、そのまま出力するのは良くない（今回は小さいからOK）
 # 「less-than-n」はn回未満の単語が何種類出現しているか。今回は1未満やから0。
 # 「total-tokens」は全ての単語（形態素）数。
 
@@ -110,7 +127,9 @@ mat
 
 ###########################よくわからん##########################
 
-# 局所的重みをtf(単語総頻度)、大域的重みをidf(単語が出現した文書数)と指定し、正規化（norm）している。
+# 単語文書行列をする時に、それぞれの文章の長さ（データ量）が異なると、解析に影響が出る。それを調整するために、「正規化」する。
+# 局所的重みをtf(単語の出現頻度)、大域的重みをidf(単語が出現した文書数)と指定し、正規化（norm）している。
+# idf= log(文書の総数/単語iが出現している文書数)+1。対数の低は任意。RMeCabは、自然対数を使ってる。
 matW <- docMatrix("data/doc", weight = "tf*idf*norm") 
 matW %>% head()
 options(digits = 3) # 少数点以下3位まで表示
@@ -124,12 +143,13 @@ matW %>% apply(2, function(x) sum(x^2))
 
 ?docMatrix
 
-#　データフレームからテキスト解析を行う場合、文字列が因子に変換されないように「stringAsFactor=FALSE」とすべし。
+# データフレームからテキスト解析を行う場合、文字列が因子に変換されないように「stringAsFactor=FALSE」とすべし。
 photo <- read.csv("data/photo.csv", stringsAsFactor = FALSE)
 photo
 res <- docMatrixDF(photo[ ,"Reply"]) # photoデータのReplyカラムだけを抽出して、単語文書行列を作成。
 # 単語文書行列を作れる関数は「docMatrix()」「docMatrix2()」「docMatrixDF()」のみ。
-res #単語文書行列（複数の文書を単語単位で解析した結果を行列で表したもの。）
+res 
+#単語文書行列（複数の文書を単語単位で解析した結果を行列で表したもの。）
 
 
 # docDFは、「Nグラム」を作る関数。
@@ -169,6 +189,7 @@ merosu %>% head(20)
 # docNgramはNグラムデータを行列で出力。
 merosu <- docNgram("data/doc")
 merosu %>% head()
+# 行名がバイグラムになってるから、行名確認すればOK。
 merosu %>% rownames()
 
 # NgramDF()は、「ネットワークグラフ」を作成する場合に使う。

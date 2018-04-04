@@ -116,14 +116,17 @@ rpart.result <- rpart(type ~ ., data = spam.train)
 # 判別モデルの確認
 rpart.result
 
-# 追加パッケージのインストール（初回のみ）
-install.packages("partykit", dependencies = TRUE)
-# 追加パッケージの読み込み（Rを起動するごとに毎回）
+
+
+# install.packages("partykit", dependencies = TRUE)
+# 決定木の結果を可視化するには、partykitパッケージのplot関数
 library(partykit)
 # 決定木の判別モデルの可視化
 plot(as.party(rpart.result))
 
-# 枝の剪定基準の決定
+# 決定木分析で、過学習を避けるために「枝の剪定」を行う。
+# 枝の剪定(plotcp関数)基準の決定
+# 出力された図の点線と交差する値（今回は0.036）が
 plotcp(rpart.result)
 
 # 剪定基準を指定して判別モデルを構築
@@ -140,9 +143,12 @@ rpart.tab
 # 分類精度の確認（表の対角要素の総数を全要素数で割る）
 sum(diag(rpart.tab)) / sum(rpart.tab)
 
-# 追加パッケージのインストール（初回のみ）
-install.packages("randomForest", dependencies = TRUE)
-# 追加パッケージの読み込み（Rを起動するごとに毎回）
+
+
+
+# install.packages("randomForest", dependencies = TRUE)
+# ランダムフォレストとは、アンサンブル学習の１つ。
+# 大量の決定木を生成し、全ての決定機から得られる結果を多数決して、最終的な分類をする。
 library(randomForest)
 # 乱数を固定
 set.seed(1)
@@ -159,3 +165,174 @@ sum(diag(randomForest.tab)) / sum(randomForest.tab)
 
 # 変数重要度の可視化
 varImpPlot(randomForest.result)
+
+
+
+
+
+# install.packages("languageR", dependencies = TRUE)
+library(languageR)
+# データセットの準備
+data(alice)
+# データセットの冒頭20語の確認
+head(alice, 20)
+
+# テキストファイルからのデータ読み込み（Obama.txtを選択）
+text.data <- scan(file.choose(), what = "char", sep = "\n", quiet = TRUE)
+# 単語ベクトルの作成
+word.vector <- unlist(strsplit(text.data, "\\W"))
+# スペースを削除
+not.blank <- which(word.vector != "")
+obama <- word.vector[not.blank]
+# データの確認
+head(obama, 20)
+
+# インターネット上のデータの読み込み
+text.data <- scan("http://www.xxx/yyy.txt", what = "char", sep = "\n", quiet = TRUE)
+
+# 分析テキストの指定
+word.vector <- alice
+# 大文字を小文字に変換
+word.vector.lower <- tolower(word.vector)
+# 検索語の生起位置を取得（ここでは，"rabbit"）
+word.positions <- which(word.vector.lower == "rabbit")
+# 検索語の前後何語まで表示するかを指定（ここでは，5語）
+context <- 5
+# KWICコンコーダンスの作成
+for(i in seq(word.positions)) {
+  if(word.positions[i] == 1) {
+    before <- NULL
+  } else {
+    start <- word.positions[i] - context
+    start <- max(start, 1)
+    before <- word.vector.lower[start : (word.positions[i] - 1)]
+  }
+  end <- word.positions[i] + context
+  after <- word.vector.lower[(word.positions[i] + 1) : end]
+  after[is.na(after)] <- ""
+  keyword <- word.vector.lower[word.positions[i]]
+  cat("--------------------", i, "--------------------", "\n")
+  cat(before, "[", keyword, "]", after, "\n")
+}
+
+# 検索語の生起位置を視覚化
+# ある語が全体を通して使われているのか、一部だけに登場するのかが分かる。
+# 今回のコンコーダンスプロットでは、「rabbit」は前半と後半で多く使われているとわかった。
+plot(word.vector.lower == "rabbit", type = "h", yaxt = "n", main = "rabbit")
+
+
+
+
+
+
+# install.packages("tm", dependencies = TRUE)
+library(tm)
+# 数字と句読点の削除
+corpus.cleaned <- removeNumbers(word.vector.lower)
+corpus.cleaned <- removePunctuation(corpus.cleaned)
+# スペースを削除
+not.blank <- which(corpus.cleaned != "")
+corpus.cleaned <- corpus.cleaned [not.blank]
+# 頻度表の作成
+freq.list <- table(corpus.cleaned)
+sorted.freq.list <- sort(freq.list, decreasing = TRUE)
+sorted.table <- paste(names(sorted.freq.list), sorted.freq.list, sep = ": ")
+# 頻度表（頻度上位20位まで）の確認
+head(sorted.table, 20)
+
+# ストップワードを個別に設定（ここでは，"the"と"and"を除外）
+corpus.cleaned.2 <- removeWords(corpus.cleaned, c("the", "and"))
+# スペースを削除
+not.blank <- which(corpus.cleaned.2 != "")
+corpus.cleaned.2 <- corpus.cleaned.2[not.blank]
+# 頻度表の作成
+freq.list.2 <- table(corpus.cleaned.2)
+sorted.freq.list.2 <- sort(freq.list.2, decreasing = TRUE)
+sorted.table.2 <- paste(names(sorted.freq.list.2), sorted.freq.list.2, sep = ": ")
+# 頻度表（頻度上位20位まで）の確認
+head(sorted.table.2, 20)
+
+# 語幹処理
+corpus.cleaned.3 <- stemDocument(corpus.cleaned)
+# 頻度表の作成
+freq.list.3 <- table(corpus.cleaned.3)
+sorted.freq.list.3 <- sort(freq.list.3, decreasing = TRUE)
+sorted.table.3 <- paste(names(sorted.freq.list.3), sorted.freq.list.3, sep = ": ")
+# 頻度表（頻度上位20位まで）の確認
+head(sorted.table.3, 20)
+
+
+
+
+library(wordcloud)
+wordcloud(corpus.cleaned, min.freq = 5, random.order = FALSE)
+
+# 2-gramsの抽出
+ngrams <- paste(corpus.cleaned[1 : (length(corpus.cleaned) - 1)], corpus.cleaned[2 : length(corpus.cleaned)])
+# 頻度集計
+ngram.freq <- table(ngrams)
+sorted.ngram.freq <- sort(ngram.freq, decreasing = TRUE)
+sorted.ngram.table <- paste(names(sorted.ngram.freq), sorted.ngram.freq, sep = ": ")
+# 頻度上位20位までを表示
+head(sorted.ngram.table, 20)
+
+
+
+
+# 共起語の頻度分析
+# 検索語の指定（ここでは，"rabbit"）
+search.word <- "\\brabbit\\b"
+# スパンの指定（ここでは，前後2語まで）
+span <- 2
+span <- (-span : span)
+# 出力ファイル名の指定（ここでは，output.txt）
+output.file <- "output.txt"
+# 検索語の出現する位置を特定
+positions.of.matches <- grep(search.word, corpus.cleaned, perl = TRUE)
+# 共起語の集計
+results <- list()
+for(i in 1 : length(span)) { 
+  collocate.positions <- positions.of.matches + span[i]
+  collocates <- corpus.cleaned[collocate.positions]
+  sorted.collocates <- sort(table(collocates), decreasing = TRUE)
+  results[[i]] <- sorted.collocates
+}
+# 集計表のヘッダーを出力
+cat(paste(rep(c("W_", "F_"), length(span)), rep(span, each = 2), sep = ""), "\n", sep = "\t", file = output.file)
+# 集計データを出力
+lengths <- sapply(results, length)
+for(k in 1 : max(lengths)) {
+  output.string <- paste(names(sapply(results, "[", k)), sapply(results, "[", k), sep = "\t")
+  output.string.2 <- gsub("NA\tNA", "\t", output.string, perl = TRUE)
+  cat(output.string.2, "\n", sep = "\t", file = output.file, append = TRUE)
+}
+
+
+
+
+# install.packages("koRpus", dependencies = TRUE)
+library(koRpus)
+# テキストの読み込み（Obama.txtを選択）
+tok <- tokenize(file.choose(), lang = "en")
+
+# 異語率の計算
+# 異語率は、テキストの総語数に影響される。だから、総語数の異なるテキストを比較するのはアカン。
+TTR(tok)
+
+# ギロー指数の計算
+# ギロー指数は、総語数の影響を緩和できる。
+R.ld(tok)
+
+# MATTRの計算
+MATTR(tok)
+# MTLDの計算
+MTLD(tok)
+
+# Flesch-Kincaid Grade Levelの計算
+flesch.kincaid(tok)
+
+# Coleman-Liau Indexの計算
+coleman.liau(tok)
+# Automated Readability Indexの計算
+ARI(tok)
+
