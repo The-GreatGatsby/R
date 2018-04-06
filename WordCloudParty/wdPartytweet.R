@@ -19,10 +19,10 @@ library("wordcloud")
 library("twitteR")
 library(ROAuth)
 
-consumerKey <- ""
-consumerSecret <- ""
-accessToken <- ""
-accessSecret <- ""
+consumerKey <- "hQQ8mlkFhG4UoUV67xTwIbQTu"
+consumerSecret <- "dd2ldZBbaU6wJS3ElV5xQozZg1SjuVJUgITlA9Cc8K6cub59Xo"
+accessToken <- "898910528730406912-zKbDnTeda1pHuQvXgokDmQOzxnB3XAh"
+accessSecret <- "lxpkojqoTPABQT2g3F5SZvI9CNPTmwyDpiIg7TTAn8tlb"
 
 options(httr_oauth_cache = TRUE)
 setup_twitter_oauth(consumerKey, consumerSecret, accessToken, accessSecret)
@@ -202,7 +202,8 @@ jimin_df %<>% select(everything(), FREQ = starts_with("file"))
 head(jimin_df)
 unlink(xfile) #一時ファイルを削除
 jimin_df %>% arrange(FREQ) %>% tail(50)
-
+#訳分らん1文字漢字も削除
+jimin_df %<>% filter(!TERM %in% c("党","木","こ","平","月","将","明","年","日","回"))
 
 # termとpos1が同じでもpos2が違うくて同じ語が2個以上出現している。
 # 一つにまとめる。
@@ -212,7 +213,7 @@ jimin_df2 <- jimin_df%>% select(TERM, POS1, FREQ) %>%
   group_by(TERM, POS1) %>%
   summarize(FREQ = sum(FREQ))
 nrow(jimin_df2) # 数行少なくなったことを確認
-wordcloud (jimin_df2$TERM, jimin_df2$FREQ, min.freq = 3, family = "JP1")
+wordcloud (jimin_df2$TERM, jimin_df2$FREQ, min.freq = 5, family = "JP1")
 
 
 
@@ -340,7 +341,7 @@ komei_df2 <- komei_df%>% select(TERM, POS1, FREQ) %>%
   group_by(TERM, POS1) %>%
   summarize(FREQ = sum(FREQ))
 nrow(komei_df2) # 数行少なくなったことを確認
-wordcloud (komei_df2$TERM, komei_df2$FREQ, min.freq = 6, family = "JP1")
+wordcloud (komei_df2$TERM, komei_df2$FREQ, min.freq = 5, family = "JP1")
 
 
 
