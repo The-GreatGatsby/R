@@ -1,16 +1,17 @@
-## あいうえお
-
-getwd()
-setwd("C:/Users/rstud/Documents/GitHub/R/TextMining")
+# 読点分析01
+library(rvest)
+library(dplyr)
+library(stringr)
 library(RMeCab)
+getwd()
+setwd("./GitHub/R/tmJapanese/touten01")
 
-############################ N グラムを利用したクラスター分析 #####################
 
 ### まずは、文字のバイグラムで、森鴎外と夏目漱石を判別できるかチャレンジ。
 ### 文字の出現頻度を解析するから、テキスト量が同じぐらいでないといけない。（作家判別に影響するから）
 ### type=0は文字単位。
 ### docNgramはデフォルトで、バイグラム。
-res <- docNgram("data/writers", type = 0)
+res <- docNgram("./data", type = 0)
 View(res)
 #行数・列数の確認
 ncol(res) ; nrow(res)
@@ -66,11 +67,9 @@ res2_pc <- princomp(t(res2))
 res2_pc <- res2 %>% t()%>% princomp()
 
 options(digits = 3)
-
 summary(res2_pc)
 
 library(ggfortify)
-
 library(stringr)
 
 # ファイル名が長いから縮める。
@@ -91,6 +90,13 @@ autoplot(res2_pc, label =TRUE, label.size = 8, loadings = TRUE,
          loadings.label = TRUE,  loadings.label.size  = 12, 
          loadings.label.family = "JP1")# Mac の場合は family = "HiraKakuProN-W3" と変えてください
 dev.off()
+
+
+
+
+
+
+
 
 
 
